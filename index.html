@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Workspace — Tableau de bord</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- HEADER (pleine largeur, au-dessus de tout) -->
+    <header class="topbar">
+        <div class="topbar-title">AI Workspace</div>
+        <div class="user-chip">
+            Admin User
+            <svg class="chevron-icon" viewBox="0 0 24 24">
+                <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+        </div>
+    </header>
+
+    <!-- CONTENT : grand conteneur avec la sidebar et le contenu principal -->
+    <div class="content">
+
+        <aside class="sidebar">
+            <div class="brand">AI Workspace</div>
+            <nav class="nav">
+                <a class="active" href="#">
+                    Tableau de bord
+                </a>
+                <a href="#">
+                    Chat
+                </a>
+                <a href="#">
+                    Résumé de texte
+                </a>
+                <a href="#">
+                    Classification
+                </a>
+                <a href="#">
+                    Traduction
+                </a>
+                <a href="#">
+                    Historique
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+
+            <h1>Tableau de bord</h1>
+            <p class="subtitle">Bienvenue sur votre espace de travail intelligent.</p>
+
+            <section class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Nombre de jeux de données</div>
+                    <div class="kpi-value">24</div>
+                    <div class="kpi-delta">+3 ce mois-ci</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Nombre de requêtes</div>
+                    <div class="kpi-value">1,256</div>
+                    <div class="kpi-delta">+18% ce mois-ci</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Nombre de modèles disponibles</div>
+                    <div class="kpi-value">12</div>
+                    <div class="kpi-delta">+2 ce mois-ci</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Utilisateurs actifs</div>
+                    <div class="kpi-value">8</div>
+                    <div class="kpi-delta">+2 ce mois-ci</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Tâches exécutées</div>
+                    <div class="kpi-value">342</div>
+                    <div class="kpi-delta">+22% ce mois-ci</div>
+                </div>
+            </section>
+
+            <section class="chart-row">
+                <div class="panel">
+                    <img class="chart-img" id="lineChartSlot" src="images/diagramme_linéaire.png"
+                        alt="Requêtes par jour">
+                </div>
+                <div class="panel">
+                    <img class="chart-img chart-img--donut" id="donutChartSlot"
+                        src="images/diagramme_circulaire_camembert.png" alt="Répartition des requêtes par service">
+                </div>
+            </section>
+
+            <section class="bottom-row">
+                <div class="panel">
+                    <div class="panel-title panel-title--block">Activité récente</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Activité</th>
+                                <th>Service</th>
+                                <th>Utilisateur</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Résumé du document_projet.pdf</td>
+                                <td class="muted-cell">Résumé de texte</td>
+                                <td class="muted-cell">Admin User</td>
+                                <td class="muted-cell">21/05/2024 14:32</td>
+                            </tr>
+                            <tr>
+                                <td>Classification de sentiments</td>
+                                <td class="muted-cell">Classification</td>
+                                <td class="muted-cell">Admin User</td>
+                                <td class="muted-cell">21/05/2024 14:21</td>
+                            </tr>
+                            <tr>
+                                <td>Traduction FR → EN</td>
+                                <td class="muted-cell">Traduction</td>
+                                <td class="muted-cell">Admin User</td>
+                                <td class="muted-cell">21/05/2024 14:15</td>
+                            </tr>
+                            <tr>
+                                <td>Discussion sur l'IA générative</td>
+                                <td class="muted-cell">Chat</td>
+                                <td class="muted-cell">Admin User</td>
+                                <td class="muted-cell">21/05/2024 14:05</td>
+                            </tr>
+                            <tr>
+                                <td>Génération d'idées de projet</td>
+                                <td class="muted-cell">Idées</td>
+                                <td class="muted-cell">Admin User</td>
+                                <td class="muted-cell">21/05/2024 13:50</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <a class="panel-footer" href="#">Voir tout l'historique</a>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-title panel-title--block">Modèles populaires</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Modèle</th>
+                                <th class="th-right">Utilisations</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>mistral-7b-instruct</td>
+                                <td class="muted-cell td-right">532</td>
+                            </tr>
+                            <tr>
+                                <td>gpt-4-turbo</td>
+                                <td class="muted-cell td-right">389</td>
+                            </tr>
+                            <tr>
+                                <td>llama-3-8b</td>
+                                <td class="muted-cell td-right">256</td>
+                            </tr>
+                            <tr>
+                                <td>bert-base-uncased</td>
+                                <td class="muted-cell td-right">179</td>
+                            </tr>
+                            <tr>
+                                <td>google-translate-v1</td>
+                                <td class="muted-cell td-right">142</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <a class="panel-footer" href="#">Voir tous les modèles</a>
+                </div>
+            </section>
+
+        </main>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
