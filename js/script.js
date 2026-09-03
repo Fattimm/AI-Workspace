@@ -54,6 +54,9 @@ function afficherModule(module) {
 
         afficherModulePrediction();
 
+    } else if (module === 'historique') {
+
+        afficherModuleHistorique();
     }
 }
 
@@ -694,4 +697,306 @@ function apiPrediction(donnees) {
 
         timestamp: new Date().toISOString()
     };
+}
+
+
+// ===========================================================
+// FAUSSE API — HISTORIQUE
+// ===========================================================
+
+function enregistrerHistorique(service, resultat) {
+
+    const historique =
+        JSON.parse(
+            localStorage.getItem('aiWorkspaceHistorique')
+        ) || [];
+
+    historique.push({
+
+        service: service,
+
+        resultat: resultat,
+
+        date: new Date().toLocaleString('fr-FR')
+    });
+
+    localStorage.setItem(
+        'aiWorkspaceHistorique',
+        JSON.stringify(historique)
+    );
+}
+
+function afficherModuleHistorique() {
+
+    mainContent.innerHTML = '';
+
+    // =======================================================
+    // TITRE
+    // =======================================================
+
+    const titre = document.createElement('h1');
+    titre.textContent = 'Historique';
+    mainContent.appendChild(titre);
+
+    const sousTitre = document.createElement('p');
+    sousTitre.classList.add('subtitle');
+    sousTitre.textContent =
+        'Consultez, recherchez ou supprimez vos opérations précédentes.';
+    mainContent.appendChild(sousTitre);
+
+
+    // =======================================================
+    // PANEL
+    // =======================================================
+
+    const panel = document.createElement('div');
+    panel.classList.add('panel');
+    mainContent.appendChild(panel);
+
+
+    // =======================================================
+    // BARRE DE RECHERCHE
+    // =======================================================
+
+    const recherche = document.createElement('input');
+
+    recherche.type = 'text';
+    recherche.classList.add('resume-input');
+    recherche.placeholder =
+        'Rechercher dans l\'historique...';
+
+    panel.appendChild(recherche);
+
+
+    // =======================================================
+    // BOUTON VIDER
+    // =======================================================
+
+    const boutonVider = document.createElement('button');
+
+    boutonVider.classList.add('btn-primary');
+    boutonVider.textContent = 'Vider l\'historique';
+
+    panel.appendChild(boutonVider);
+
+
+    // =======================================================
+    // ZONE HISTORIQUE
+    // =======================================================
+
+    const zoneHistorique = document.createElement('div');
+
+    panel.appendChild(zoneHistorique);
+
+
+    // =======================================================
+    // FONCTION AFFICHER HISTORIQUE
+    // =======================================================
+
+    function afficherListeHistorique() {
+
+        zoneHistorique.innerHTML = '';
+
+        const historique =
+            JSON.parse(
+                localStorage.getItem('aiWorkspaceHistorique')
+            ) || [];
+
+
+        // Aucun élément
+        if (historique.length === 0) {
+
+            const message = document.createElement('p');
+
+            message.textContent =
+                'Aucun historique disponible.';
+
+            zoneHistorique.appendChild(message);
+
+            return;
+        }
+
+
+        // Texte recherché
+        const texteRecherche =
+            recherche.value.toLowerCase().trim();
+
+
+        // Filtrage
+        const resultats =
+            historique.filter(function (element) {
+
+                return (
+                    element.service
+                        .toLowerCase()
+                        .includes(texteRecherche)
+
+                    ||
+
+                    element.resultat
+                        .toLowerCase()
+                        .includes(texteRecherche)
+
+                    ||
+
+                    element.date
+                        .toLowerCase()
+                        .includes(texteRecherche)
+                );
+            });
+
+
+        // Aucun résultat après recherche
+        if (resultats.length === 0) {
+
+            const message = document.createElement('p');
+
+            message.textContent =
+                'Aucun résultat trouvé.';
+
+            zoneHistorique.appendChild(message);
+
+            return;
+        }
+
+
+        // Affichage du plus récent au plus ancien
+        resultats.reverse().forEach(function (element, index) {
+
+            const bloc = document.createElement('div');
+
+            bloc.style.marginBottom = '16px';
+            bloc.style.paddingBottom = '16px';
+            bloc.style.borderBottom =
+                '1px solid var(--color-border)';
+
+
+            // SERVICE
+            const service = document.createElement('strong');
+
+            service.textContent =
+                element.service;
+
+            bloc.appendChild(service);
+
+
+            // RESULTAT
+            const resultat = document.createElement('p');
+
+            resultat.textContent =
+                element.resultat;
+
+            bloc.appendChild(resultat);
+
+
+            // DATE
+            const date = document.createElement('small');
+
+            date.textContent =
+                element.date;
+
+            date.style.color =
+                'var(--color-text-muted)';
+
+            bloc.appendChild(date);
+
+
+            // BOUTON SUPPRIMER
+            const boutonSupprimer =
+                document.createElement('button');
+
+            boutonSupprimer.classList.add(
+                'btn-primary'
+            );
+
+            boutonSupprimer.textContent =
+                'Supprimer';
+
+            boutonSupprimer.style.marginLeft =
+                '10px';
+
+            boutonSupprimer.addEventListener(
+                'click',
+                function () {
+
+                    supprimerHistorique(element);
+
+                }
+            );
+
+            bloc.appendChild(boutonSupprimer);
+
+
+            zoneHistorique.appendChild(bloc);
+        });
+    }
+
+
+    // =======================================================
+    // RECHERCHE
+    // =======================================================
+
+    recherche.addEventListener(
+        'input',
+        afficherListeHistorique
+    );
+
+
+    // =======================================================
+    // VIDER TOUT L'HISTORIQUE
+    // =======================================================
+
+    boutonVider.addEventListener(
+        'click',
+        function () {
+
+            const confirmation =
+                confirm(
+                    'Voulez-vous vraiment vider tout l\'historique ?'
+                );
+
+            if (confirmation) {
+
+                localStorage.removeItem(
+                    'aiWorkspaceHistorique'
+                );
+
+                afficherListeHistorique();
+            }
+        }
+    );
+
+
+    // Affichage initial
+    afficherListeHistorique();
+}
+
+function supprimerHistorique(elementASupprimer) {
+
+    const historique =
+        JSON.parse(
+            localStorage.getItem('aiWorkspaceHistorique')
+        ) || [];
+
+
+    const nouvelHistorique =
+        historique.filter(function (element) {
+
+            return !(
+                element.service === elementASupprimer.service &&
+                element.resultat === elementASupprimer.resultat &&
+                element.date === elementASupprimer.date
+            );
+
+        });
+
+
+    localStorage.setItem(
+        'aiWorkspaceHistorique',
+        JSON.stringify(nouvelHistorique)
+    );
+
+
+    // Recharge l'affichage
+    afficherModuleHistorique();
 }
