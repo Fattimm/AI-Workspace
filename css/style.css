@@ -327,6 +327,60 @@ td {
   border-color: var(--color-primary);
 }
 
+/* ===== MODULE CHAT IA (Partie 5) ===== */
+.chat-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+ 
+.chat-message {
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  max-width: 75%;
+}
+ 
+.chat-message--bot {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  align-self: flex-start;
+}
+ 
+.chat-message--user {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  align-self: flex-end;
+}
+ 
+.chat-input-row {
+  display: flex;
+  gap: 10px;
+}
+ 
+.chat-input {
+  flex: 1;
+  font-family: inherit;
+  font-size: 0.92rem;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+ 
+.chat-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+ 
+.chat-input:disabled {
+  background-color: var(--color-bg);
+  cursor: not-allowed;
+}
+
 @media (max-width: 1024px) {
   .kpi-grid {
     grid-template-columns: repeat(3, 1fr);

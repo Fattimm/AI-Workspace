@@ -31,9 +31,12 @@ function afficherModule(module) {
         afficherModuleResume();
     } else if (module === 'traduction') {
         afficherModuleTraduction();
+    } else if (module === 'chat') {
+        afficherModuleChat();
     }
     // autre module
 }
+ 
 
 
 function afficherModuleResume() {
@@ -216,3 +219,117 @@ function genererTraductionSimulee(texte, langue) {
     // on indique juste dans quelle langue le texte "aurait" été traduit
     return 'Traduction simulée en ' + langue + ' : ' + texte;
 }
+
+
+// ===========================================================
+// PARTIE 5 — MODULE CHAT IA
+// ===========================================================
+function afficherModuleChat() {
+ 
+    // On vide la zone principale avant d'y construire le nouveau contenu
+    mainContent.innerHTML = '';
+ 
+    // --- Titre du module ---
+    const titre = document.createElement('h1');
+    titre.textContent = 'Chat IA';
+    mainContent.appendChild(titre);
+ 
+    const sousTitre = document.createElement('p');
+    sousTitre.classList.add('subtitle');
+    sousTitre.textContent = 'Posez une question à l\'assistant virtuel.';
+    mainContent.appendChild(sousTitre);
+ 
+    // --- Panel contenant tout le chat ---
+    const panel = document.createElement('div');
+    panel.classList.add('panel', 'panel--form');
+    mainContent.appendChild(panel);
+ 
+    // --- Zone qui va contenir tous les messages (question + réponses) ---
+    const zoneMessages = document.createElement('div');
+    zoneMessages.classList.add('chat-messages');
+    panel.appendChild(zoneMessages);
+ 
+    // Message d'accueil affiché au départ, avant toute question
+    const messageAccueil = document.createElement('p');
+    messageAccueil.classList.add('chat-message', 'chat-message--bot');
+    messageAccueil.textContent = 'Bonjour ! Comment puis-je vous aider aujourd\'hui ?';
+    zoneMessages.appendChild(messageAccueil);
+ 
+    // --- Zone de saisie + bouton d'envoi, groupés dans une même ligne ---
+    const zoneSaisie = document.createElement('div');
+    zoneSaisie.classList.add('chat-input-row');
+    panel.appendChild(zoneSaisie);
+ 
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.classList.add('chat-input');
+    input.placeholder = 'Écrivez votre message...';
+    zoneSaisie.appendChild(input);
+ 
+    const boutonEnvoyer = document.createElement('button');
+    boutonEnvoyer.classList.add('btn-primary');
+    boutonEnvoyer.textContent = 'Envoyer';
+    zoneSaisie.appendChild(boutonEnvoyer);
+ 
+    // --- Fonction qui gère l'envoi d'un message ---
+    function envoyerMessage() {
+        const texteSaisi = input.value.trim();
+ 
+        if (texteSaisi === '') {
+            return; // on n'envoie rien si le champ est vide, pas besoin de message d'erreur ici
+        }
+ 
+        // 1. On affiche le message de l'utilisateur dans la conversation
+        const messageUtilisateur = document.createElement('p');
+        messageUtilisateur.classList.add('chat-message', 'chat-message--user');
+        messageUtilisateur.textContent = texteSaisi;
+        zoneMessages.appendChild(messageUtilisateur);
+ 
+        // On vide le champ de saisie tout de suite, et on désactive le temps de la réponse
+        input.value = '';
+        input.disabled = true;
+        boutonEnvoyer.disabled = true;
+ 
+        // 2. On affiche un indicateur "en train d'écrire..."
+        const indicateur = document.createElement('p');
+        indicateur.classList.add('chat-message', 'chat-message--bot');
+        indicateur.textContent = 'L\'assistant écrit...';
+        zoneMessages.appendChild(indicateur);
+ 
+        // 3. Après un délai simulé, on remplace l'indicateur par la vraie réponse
+        setTimeout(function () {
+            indicateur.textContent = genererReponseSimulee(texteSaisi);
+            input.disabled = false;
+            boutonEnvoyer.disabled = false;
+            input.focus(); // remet le curseur dans le champ, prêt pour la prochaine question
+        }, 1200);
+    }
+ 
+    // --- Déclenchement au clic sur le bouton ---
+    boutonEnvoyer.addEventListener('click', envoyerMessage);
+ 
+    // --- Déclenchement avec la touche Entrée ---
+    input.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            envoyerMessage();
+        }
+    });
+}
+ 
+ 
+// ===========================================================
+// FONCTION DE SIMULATION DE LA RÉPONSE DU CHAT
+// ===========================================================
+function genererReponseSimulee(question) {
+    // Quelques réponses toutes faites, choisies au hasard
+    const reponses = [
+        'C\'est une excellente question, laissez-moi y réfléchir.',
+        'Je comprends votre demande, voici ce que je peux vous dire.',
+        'Merci pour votre message, je traite votre requête.',
+        'Voici une réponse simulée à votre question sur : "' + question + '".'
+    ];
+ 
+    const indexAleatoire = Math.floor(Math.random() * reponses.length);
+    return reponses[indexAleatoire];
+}
+ 
