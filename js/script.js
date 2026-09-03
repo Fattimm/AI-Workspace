@@ -1,145 +1,187 @@
-// récupération des elements du DOM
+// Récupération des éléments du DOM
 const navLinks = document.querySelectorAll('.nav a');
 const mainContent = document.getElementById('main-content');
 
-// On sauvegarde le contenu HTML d'origine du tableau de bord,
-// pour pouvoir le réafficher quand on reclique sur "Tableau de bord"
+// Sauvegarde du tableau de bord original
 const dashboardHTML = mainContent.innerHTML;
 
-navLinks.forEach(function (link) {
-    link.addEventListener('click', function (event) {
-        event.preventDefault(); // empêche le lien "#" de faire remonter la page en haut
 
-        // Retire la classe "active" de tous les liens, puis l'ajoute seulement au lien cliqué
+// ===========================================================
+// NAVIGATION
+// ===========================================================
+
+navLinks.forEach(function (link) {
+
+    link.addEventListener('click', function (event) {
+
+        event.preventDefault();
+
+        // Retire active de tous les liens
         navLinks.forEach(function (l) {
             l.classList.remove('active');
         });
 
+        // Active le lien cliqué
         link.classList.add('active');
 
-        // Récupère le nom du module à afficher (ex: "resume", "chat"...)
+        // Récupère le module demandé
         const module = link.getAttribute('data-module');
+
         afficherModule(module);
     });
 });
 
 
 function afficherModule(module) {
-    if (module === 'dashboard') {
-        mainContent.innerHTML = dashboardHTML;
-    } else if (module === 'resume') {
-        afficherModuleResume();
-    } else if (module === 'traduction') {
-        afficherModuleTraduction();
-    } else if (module === 'chat') {
-        afficherModuleChat();
-    }
-    // autre module
-}
- 
 
+    if (module === 'dashboard') {
+
+        mainContent.innerHTML = dashboardHTML;
+
+    } else if (module === 'resume') {
+
+        afficherModuleResume();
+
+    } else if (module === 'traduction') {
+
+        afficherModuleTraduction();
+
+    } else if (module === 'chat') {
+
+        afficherModuleChat();
+
+    } else if (module === 'prediction') {
+
+        afficherModulePrediction();
+
+    }
+}
+
+
+// ===========================================================
+// PARTIE 3 — RÉSUMÉ DE TEXTE
+// ===========================================================
 
 function afficherModuleResume() {
 
-    // On vide la zone principale avant d'y construire le nouveau contenu
     mainContent.innerHTML = '';
 
-    // --- Titre du module ---
     const titre = document.createElement('h1');
     titre.textContent = 'Résumé de texte';
     mainContent.appendChild(titre);
 
     const sousTitre = document.createElement('p');
     sousTitre.classList.add('subtitle');
-    sousTitre.textContent = 'Bienvenue sur votre espace de travail intelligent. Saisissez ou collez votre texte, puis cliquez sur Résumer.';
+    sousTitre.textContent =
+        'Bienvenue sur votre espace de travail intelligent. Saisissez ou collez votre texte, puis cliquez sur Résumer.';
     mainContent.appendChild(sousTitre);
 
-    // --- Panel contenant le formulaire ---
     const panel = document.createElement('div');
     panel.classList.add('panel', 'panel--form');
     mainContent.appendChild(panel);
 
-    // --- Label ---
     const label = document.createElement('label');
     label.classList.add('field-label');
     label.textContent = 'Texte à résumer';
     panel.appendChild(label);
 
-    // --- Zone de saisie (textarea) ---
     const textarea = document.createElement('textarea');
     textarea.classList.add('resume-input');
     textarea.placeholder = 'Collez ou écrivez votre texte ici...';
     textarea.rows = 8;
     panel.appendChild(textarea);
 
-    // --- Bouton "Résumer" ---
     const bouton = document.createElement('button');
     bouton.classList.add('btn-primary');
     bouton.textContent = 'Résumer';
     panel.appendChild(bouton);
 
-    // --- Zone d'affichage du résumé ---
     const zoneResultat = document.createElement('div');
     zoneResultat.classList.add('resume-output');
     zoneResultat.textContent = 'Le résumé apparaîtra ici.';
     panel.appendChild(zoneResultat);
 
-    // --- Comportement du bouton au clic ---
     bouton.addEventListener('click', function () {
+
         const texteSaisi = textarea.value.trim();
 
-        // Si l'utilisateur n'a rien écrit, on ne fait rien de plus qu'un message d'erreur
         if (texteSaisi === '') {
-            zoneResultat.textContent = 'Veuillez saisir un texte avant de le résumer.';
+
+            zoneResultat.textContent =
+                'Veuillez saisir un texte avant de le résumer.';
+
             return;
         }
 
-        // On désactive le bouton et on affiche un état de chargement pendant la simulation
         bouton.disabled = true;
-        zoneResultat.textContent = 'Génération du résumé en cours...';
 
-        // setTimeout simule le délai d'un vrai appel API (1.2 seconde ici)
+        zoneResultat.textContent =
+            'Génération du résumé en cours...';
+
         setTimeout(function () {
-            const resume = genererResumeSimule(texteSaisi);
-            zoneResultat.textContent = resume;
+
+            // Appel de notre fausse API
+            const resultat = apiResume({
+                texte: texteSaisi
+            });
+
+            zoneResultat.textContent =
+                resultat.resume;
+
+            enregistrerHistorique(
+                'Résumé de texte',
+                resultat.resume
+            );
+
             bouton.disabled = false;
+
         }, 1200);
     });
 }
 
 
-function genererResumeSimule(texte) {
-    // Simulation très simple : on prend les 100 premiers caractères du texte
-    // (dans un vrai projet, ceci serait remplacé par un appel à une API IA)
-    const extrait = texte.substring(0, 100);
-    return 'Résumé simulé : ' + extrait + (texte.length > 100 ? '...' : '');
+// ===========================================================
+// FAUSSE API — RÉSUMÉ
+// ===========================================================
+
+function apiResume(donnees) {
+
+    const extrait = donnees.texte.substring(0, 100);
+
+    return {
+        success: true,
+        service: 'resume-simule',
+        resume:
+            'Résumé simulé : ' +
+            extrait +
+            (donnees.texte.length > 100 ? '...' : ''),
+        timestamp: new Date().toISOString()
+    };
 }
 
 
 // ===========================================================
-// PARTIE 4 — MODULE TRADUCTION
+// PARTIE 4 — TRADUCTION
 // ===========================================================
+
 function afficherModuleTraduction() {
 
-    // On vide la zone principale avant d'y construire le nouveau contenu
     mainContent.innerHTML = '';
 
-    // --- Titre du module ---
     const titre = document.createElement('h1');
     titre.textContent = 'Traduction';
     mainContent.appendChild(titre);
 
     const sousTitre = document.createElement('p');
     sousTitre.classList.add('subtitle');
-    sousTitre.textContent = 'Traduisez votre texte dans la langue de votre choix.';
+    sousTitre.textContent =
+        'Traduisez votre texte dans la langue de votre choix.';
     mainContent.appendChild(sousTitre);
 
-    // --- Panel contenant le formulaire ---
     const panel = document.createElement('div');
     panel.classList.add('panel', 'panel--form');
     mainContent.appendChild(panel);
 
-    // --- Label + zone de saisie ---
     const label = document.createElement('label');
     label.classList.add('field-label');
     label.textContent = 'Texte à traduire';
@@ -147,11 +189,11 @@ function afficherModuleTraduction() {
 
     const textarea = document.createElement('textarea');
     textarea.classList.add('resume-input');
-    textarea.placeholder = 'Écrivez ou collez votre texte ici...';
+    textarea.placeholder =
+        'Écrivez ou collez votre texte ici...';
     textarea.rows = 6;
     panel.appendChild(textarea);
 
-    // --- Label + choix de la langue (select) ---
     const labelLangue = document.createElement('label');
     labelLangue.classList.add('field-label');
     labelLangue.textContent = 'Langue cible';
@@ -161,7 +203,6 @@ function afficherModuleTraduction() {
     select.classList.add('select-langue');
     panel.appendChild(select);
 
-    // Liste des langues disponibles : value = code technique, texte = nom affiché
     const langues = [
         { value: 'en', texte: 'Anglais' },
         { value: 'es', texte: 'Espagnol' },
@@ -170,166 +211,487 @@ function afficherModuleTraduction() {
     ];
 
     langues.forEach(function (langue) {
+
         const option = document.createElement('option');
+
         option.value = langue.value;
         option.textContent = langue.texte;
+
         select.appendChild(option);
     });
 
-    // --- Bouton "Traduire" ---
     const bouton = document.createElement('button');
     bouton.classList.add('btn-primary');
     bouton.textContent = 'Traduire';
     panel.appendChild(bouton);
 
-    // --- Zone d'affichage de la traduction ---
     const zoneResultat = document.createElement('div');
     zoneResultat.classList.add('resume-output');
-    zoneResultat.textContent = 'La traduction apparaîtra ici.';
+    zoneResultat.textContent =
+        'La traduction apparaîtra ici.';
     panel.appendChild(zoneResultat);
 
-    // --- Comportement du bouton au clic ---
     bouton.addEventListener('click', function () {
+
         const texteSaisi = textarea.value.trim();
-        const langueChoisie = select.value;         // ex: "en"
-        const langueTexte = select.options[select.selectedIndex].textContent; // ex: "Anglais"
+
+        const langueChoisie = select.value;
+
+        const langueTexte =
+            select.options[select.selectedIndex].textContent;
 
         if (texteSaisi === '') {
-            zoneResultat.textContent = 'Veuillez saisir un texte avant de le traduire.';
+
+            zoneResultat.textContent =
+                'Veuillez saisir un texte avant de le traduire.';
+
             return;
         }
 
         bouton.disabled = true;
-        zoneResultat.textContent = 'Traduction en cours...';
+
+        zoneResultat.textContent =
+            'Traduction en cours...';
 
         setTimeout(function () {
-            const traduction = genererTraductionSimulee(texteSaisi, langueTexte);
-            zoneResultat.textContent = traduction;
+
+            const resultat = apiTraduction({
+                texte: texteSaisi,
+                langue: langueChoisie
+            });
+
+            zoneResultat.textContent =
+                resultat.traduction;
+
+            enregistrerHistorique(
+                'Traduction',
+                resultat.traduction
+            );
+
             bouton.disabled = false;
+
         }, 1200);
     });
 }
 
 
 // ===========================================================
-// FONCTION DE SIMULATION DE LA TRADUCTION
+// FAUSSE API — TRADUCTION
 // ===========================================================
-function genererTraductionSimulee(texte, langue) {
-    // Simulation très simple : on ne traduit pas réellement,
-    // on indique juste dans quelle langue le texte "aurait" été traduit
-    return 'Traduction simulée en ' + langue + ' : ' + texte;
+
+function apiTraduction(donnees) {
+
+    const nomsLangues = {
+        en: 'anglais',
+        es: 'espagnol',
+        de: 'allemand',
+        ar: 'arabe'
+    };
+
+    const langue =
+        nomsLangues[donnees.langue] || donnees.langue;
+
+    return {
+        success: true,
+        service: 'traduction-simulee',
+        traduction:
+            'Traduction simulée en ' +
+            langue +
+            ' : ' +
+            donnees.texte,
+        timestamp: new Date().toISOString()
+    };
 }
 
 
 // ===========================================================
-// PARTIE 5 — MODULE CHAT IA
+// PARTIE 5 — CHAT IA
 // ===========================================================
+
 function afficherModuleChat() {
- 
-    // On vide la zone principale avant d'y construire le nouveau contenu
+
     mainContent.innerHTML = '';
- 
-    // --- Titre du module ---
+
     const titre = document.createElement('h1');
     titre.textContent = 'Chat IA';
     mainContent.appendChild(titre);
- 
+
     const sousTitre = document.createElement('p');
     sousTitre.classList.add('subtitle');
-    sousTitre.textContent = 'Posez une question à l\'assistant virtuel.';
+    sousTitre.textContent =
+        'Posez une question à l\'assistant virtuel.';
     mainContent.appendChild(sousTitre);
- 
-    // --- Panel contenant tout le chat ---
+
     const panel = document.createElement('div');
     panel.classList.add('panel', 'panel--form');
     mainContent.appendChild(panel);
- 
-    // --- Zone qui va contenir tous les messages (question + réponses) ---
+
     const zoneMessages = document.createElement('div');
     zoneMessages.classList.add('chat-messages');
     panel.appendChild(zoneMessages);
- 
-    // Message d'accueil affiché au départ, avant toute question
+
     const messageAccueil = document.createElement('p');
-    messageAccueil.classList.add('chat-message', 'chat-message--bot');
-    messageAccueil.textContent = 'Bonjour ! Comment puis-je vous aider aujourd\'hui ?';
+
+    messageAccueil.classList.add(
+        'chat-message',
+        'chat-message--bot'
+    );
+
+    messageAccueil.textContent =
+        'Bonjour ! Comment puis-je vous aider aujourd\'hui ?';
+
     zoneMessages.appendChild(messageAccueil);
- 
-    // --- Zone de saisie + bouton d'envoi, groupés dans une même ligne ---
+
     const zoneSaisie = document.createElement('div');
     zoneSaisie.classList.add('chat-input-row');
     panel.appendChild(zoneSaisie);
- 
+
     const input = document.createElement('input');
+
     input.type = 'text';
     input.classList.add('chat-input');
     input.placeholder = 'Écrivez votre message...';
+
     zoneSaisie.appendChild(input);
- 
+
     const boutonEnvoyer = document.createElement('button');
+
     boutonEnvoyer.classList.add('btn-primary');
     boutonEnvoyer.textContent = 'Envoyer';
+
     zoneSaisie.appendChild(boutonEnvoyer);
- 
-    // --- Fonction qui gère l'envoi d'un message ---
+
+
+    function ajouterMessage(texte, type) {
+
+        const message = document.createElement('p');
+
+        message.classList.add(
+            'chat-message',
+            type
+        );
+
+        message.textContent = texte;
+
+        zoneMessages.appendChild(message);
+
+        zoneMessages.scrollTop =
+            zoneMessages.scrollHeight;
+    }
+
+
     function envoyerMessage() {
+
         const texteSaisi = input.value.trim();
- 
+
         if (texteSaisi === '') {
-            return; // on n'envoie rien si le champ est vide, pas besoin de message d'erreur ici
+            return;
         }
- 
-        // 1. On affiche le message de l'utilisateur dans la conversation
-        const messageUtilisateur = document.createElement('p');
-        messageUtilisateur.classList.add('chat-message', 'chat-message--user');
-        messageUtilisateur.textContent = texteSaisi;
-        zoneMessages.appendChild(messageUtilisateur);
- 
-        // On vide le champ de saisie tout de suite, et on désactive le temps de la réponse
+
+        ajouterMessage(
+            texteSaisi,
+            'chat-message--user'
+        );
+
         input.value = '';
+
         input.disabled = true;
         boutonEnvoyer.disabled = true;
- 
-        // 2. On affiche un indicateur "en train d'écrire..."
+
         const indicateur = document.createElement('p');
-        indicateur.classList.add('chat-message', 'chat-message--bot');
-        indicateur.textContent = 'L\'assistant écrit...';
+
+        indicateur.classList.add(
+            'chat-message',
+            'chat-message--bot'
+        );
+
+        indicateur.textContent =
+            'L\'assistant écrit...';
+
         zoneMessages.appendChild(indicateur);
- 
-        // 3. Après un délai simulé, on remplace l'indicateur par la vraie réponse
+
         setTimeout(function () {
-            indicateur.textContent = genererReponseSimulee(texteSaisi);
+
+            const resultat = apiChat({
+                message: texteSaisi
+            });
+
+            indicateur.textContent =
+                resultat.message;
+
+            enregistrerHistorique(
+                'Chat',
+                resultat.message
+            );
+
             input.disabled = false;
             boutonEnvoyer.disabled = false;
-            input.focus(); // remet le curseur dans le champ, prêt pour la prochaine question
+
+            input.focus();
+
         }, 1200);
     }
- 
-    // --- Déclenchement au clic sur le bouton ---
-    boutonEnvoyer.addEventListener('click', envoyerMessage);
- 
-    // --- Déclenchement avec la touche Entrée ---
-    input.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') {
-            envoyerMessage();
+
+
+    boutonEnvoyer.addEventListener(
+        'click',
+        envoyerMessage
+    );
+
+
+    input.addEventListener(
+        'keydown',
+        function (event) {
+
+            if (event.key === 'Enter') {
+                envoyerMessage();
+            }
         }
+    );
+}
+
+
+// ===========================================================
+// FAUSSE API — CHAT
+// ===========================================================
+
+function apiChat(donnees) {
+
+    const reponses = [
+
+        'C\'est une excellente question, laissez-moi y réfléchir.',
+
+        'Je comprends votre demande, voici ce que je peux vous dire.',
+
+        'Merci pour votre message, je traite votre requête.',
+
+        'Voici une réponse simulée à votre question : "' +
+        donnees.message +
+        '".'
+    ];
+
+    const indexAleatoire =
+        Math.floor(
+            Math.random() * reponses.length
+        );
+
+    return {
+        success: true,
+        service: 'chat-simule',
+        message: reponses[indexAleatoire],
+        timestamp: new Date().toISOString()
+    };
+}
+
+
+// ===========================================================
+// PARTIE 6 — PRÉDICTION
+// ===========================================================
+
+function afficherModulePrediction() {
+
+    mainContent.innerHTML = '';
+
+    const titre = document.createElement('h1');
+    titre.textContent = 'Prédiction';
+    mainContent.appendChild(titre);
+
+    const sousTitre = document.createElement('p');
+    sousTitre.classList.add('subtitle');
+    sousTitre.textContent =
+        'Entrez les informations nécessaires pour effectuer une prédiction.';
+    mainContent.appendChild(sousTitre);
+
+    const panel = document.createElement('div');
+    panel.classList.add('panel', 'panel--form');
+    mainContent.appendChild(panel);
+
+
+    // AGE
+    const labelAge = document.createElement('label');
+    labelAge.classList.add('field-label');
+    labelAge.textContent = 'Âge';
+    panel.appendChild(labelAge);
+
+    const inputAge = document.createElement('input');
+    inputAge.type = 'number';
+    inputAge.classList.add('resume-input');
+    inputAge.placeholder = 'Ex : 25';
+    panel.appendChild(inputAge);
+
+
+    // REVENU
+    const labelRevenu = document.createElement('label');
+    labelRevenu.classList.add('field-label');
+    labelRevenu.textContent = 'Revenu';
+    panel.appendChild(labelRevenu);
+
+    const inputRevenu = document.createElement('input');
+    inputRevenu.type = 'number';
+    inputRevenu.classList.add('resume-input');
+    inputRevenu.placeholder = 'Ex : 300000';
+    panel.appendChild(inputRevenu);
+
+
+    // VILLE
+    const labelVille = document.createElement('label');
+    labelVille.classList.add('field-label');
+    labelVille.textContent = 'Ville';
+    panel.appendChild(labelVille);
+
+    const inputVille = document.createElement('input');
+    inputVille.type = 'text';
+    inputVille.classList.add('resume-input');
+    inputVille.placeholder = 'Ex : Dakar';
+    panel.appendChild(inputVille);
+
+
+    // BOUTON
+    const bouton = document.createElement('button');
+    bouton.classList.add('btn-primary');
+    bouton.textContent = 'Prédire';
+    panel.appendChild(bouton);
+
+
+    // RESULTAT
+    const zoneResultat = document.createElement('div');
+    zoneResultat.classList.add('resume-output');
+    zoneResultat.textContent =
+        'Le résultat de la prédiction apparaîtra ici.';
+    panel.appendChild(zoneResultat);
+
+
+    bouton.addEventListener('click', function () {
+
+        const age = Number(inputAge.value);
+        const revenu = Number(inputRevenu.value);
+        const ville = inputVille.value.trim();
+
+
+        // VALIDATION
+        if (
+            !age ||
+            !revenu ||
+            ville === ''
+        ) {
+
+            zoneResultat.textContent =
+                'Veuillez remplir tous les champs.';
+
+            return;
+        }
+
+
+        bouton.disabled = true;
+
+        zoneResultat.textContent =
+            'Prédiction en cours...';
+
+
+        setTimeout(function () {
+
+            // Appel de la fausse API
+            const resultat = apiPrediction({
+
+                age: age,
+
+                revenu: revenu,
+
+                ville: ville
+
+            });
+
+
+            // Affichage de la réponse
+            zoneResultat.innerHTML =
+
+                '<strong>Prédiction :</strong> ' +
+                resultat.prediction +
+
+                '<br><br>' +
+
+                '<strong>Confiance :</strong> ' +
+                resultat.confiance +
+                '%';
+
+
+            enregistrerHistorique(
+                'Prédiction',
+                resultat.prediction
+            );
+
+            bouton.disabled = false;
+
+        }, 1200);
     });
 }
- 
- 
+
+
 // ===========================================================
-// FONCTION DE SIMULATION DE LA RÉPONSE DU CHAT
+// FAUSSE API — PRÉDICTION
 // ===========================================================
-function genererReponseSimulee(question) {
-    // Quelques réponses toutes faites, choisies au hasard
-    const reponses = [
-        'C\'est une excellente question, laissez-moi y réfléchir.',
-        'Je comprends votre demande, voici ce que je peux vous dire.',
-        'Merci pour votre message, je traite votre requête.',
-        'Voici une réponse simulée à votre question sur : "' + question + '".'
-    ];
- 
-    const indexAleatoire = Math.floor(Math.random() * reponses.length);
-    return reponses[indexAleatoire];
+
+function apiPrediction(donnees) {
+
+    /*
+     * Cette fonction représente une FAUSSE API.
+     *
+     * Elle reçoit les données envoyées par le frontend :
+     * - age
+     * - revenu
+     * - ville
+     *
+     * Elle applique une logique fictive.
+     *
+     * IMPORTANT :
+     * ce n'est PAS un véritable modèle de Machine Learning.
+     */
+
+    let prediction;
+    let confiance;
+
+
+    if (
+        donnees.age < 25 &&
+        donnees.revenu < 200000
+    ) {
+
+        prediction = 'Catégorie A';
+        confiance = 72;
+
+    } else if (
+        donnees.revenu >= 500000
+    ) {
+
+        prediction = 'Catégorie C';
+        confiance = 87;
+
+    } else {
+
+        prediction = 'Catégorie B';
+        confiance = 78;
+    }
+
+
+    return {
+
+        success: true,
+
+        prediction: prediction,
+
+        confiance: confiance,
+
+        service: 'prediction-simulee',
+
+        donnees: {
+
+            age: donnees.age,
+
+            revenu: donnees.revenu,
+
+            ville: donnees.ville
+        },
+
+        timestamp: new Date().toISOString()
+    };
 }
- 
